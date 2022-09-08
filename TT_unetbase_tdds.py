@@ -11,21 +11,21 @@ import sys
 import os
 
 ## Parameters =================================================================
-## 
-train_data_path = 'train_data_list.npy'
-test_data_path  = 'test_data_list.npy'
+## Two test samples were provided
+train_data_path = None
+test_data_path  = 'data'
 
 ## 
-is_train    = True
+is_train    = False
 valid_rate  = 0.1
 random_seed = 1
 batch_num   = 10
 patch_shape = [16,256,256]
 iter_num    = 1000000000
 epoch_num   = 10
-early_stop  = -1#150
+early_stop  = 150
 
-model_save_path = 'unet_res2_ds_maxpool_2.pkl'
+model_save_path = 'unet_res2_ds_tdds.pkl'
 pred_model_path = None 
 
 
@@ -39,7 +39,7 @@ np.random.shuffle( train_data )
 np.random.seed( None )
 valid_data = train_data[:valid_num]
 train_data = train_data[valid_num:]
-test_data = np.load( test_data_path )
+test_data = glob.glob( test_data_path + /* )
 
 train_data_loader = data_loader_io( train_data, batch_num )
 valid_data_loader = data_loader_io( valid_data, 1 )
