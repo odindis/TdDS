@@ -4,4 +4,4 @@ We designed a top-down deep supervised (TdDS) method. tdDS can guide the model t
 We implemented it on the U-Net framework
 ![](https://github.com/odindis/TdDS/blob/main/model.png)
 
-The code will be uploaded gradually
+
