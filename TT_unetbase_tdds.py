@@ -16,19 +16,17 @@ train_data_path = 'train_data_list.npy'
 test_data_path  = 'test_data_list.npy'
 
 ## 
-is_train    = False
+is_train    = True
 valid_rate  = 0.1
 random_seed = 1
 batch_num   = 10
 patch_shape = [16,256,256]
 iter_num    = 1000000000
-epoch_num   = None # default = None 
-early_stop  = 150
+epoch_num   = 10
+early_stop  = -1#150
 
-model_save_path = 'unet_res2_ds_maxpool_1.pkl'
+model_save_path = 'unet_res2_ds_maxpool_2.pkl'
 pred_model_path = None 
-
-
 
 
 
@@ -153,17 +151,17 @@ if is_train:
                     valid_loss_sum += loss.detach().cpu().numpy()
                 valid_loss_mean = valid_loss_sum / ( valid_data_loader.cycle )
                 
-            ## Saveing model
+            ## Saveing mode
             if valid_loss_mean < r_test_loss:
                 torch.save( model.state_dict(), model_save_path )
                 r_test_loss = valid_loss_mean
                 es = 0
-            else:
-                es += 1
-                if es > early_stop:
-                    print()
-                    print('> early_stop')
-                    break
+                
+            if es > early_stop:
+                print()
+                print('> early_stop')
+                break
+            
             ## Print info
             train_loss_mean = train_loss_sum / epoch_num
             train_loss_sum = 0
@@ -177,27 +175,7 @@ model.load_state_dict( torch.load( model_save_path ) )
 model.eval()
 with torch.no_grad():
     test_loss_sum = 0
-
-    slice_dsc_list  = []
-    slice_nsd_list  = []
-    slice_hd_list   = []
-    slice_hd95_list = []
-    
-    dice_recoder   = []
-    dice_list      = []
-    dice_2_list    = []
-    dice_l_list    = []
-    recall_list    = []
-    dice_pl_list   = []
-    sa_list        = []
-    hd_list        = []
-    precision_list = []
-    
-    dsc_list = []
-    nsd_list = []
-    hd95_list = []
-    NSD_list = []
-    
+    dice_list = []
     for iter_ in range( test_data_loader.cycle ):
         sys.stdout.write( f'\r> testing : {iter_+1}/{test_data_loader.cycle}'
                           f'                                         '
@@ -228,23 +206,11 @@ with torch.no_grad():
         dice_list.append( float( dice_torch( output[0,1], labels[0,0] ) ) )
 
         
-        
 
 
-
-    ## Showing
-    print()
+    # ## Showing
+    # print()
     print('---Result--------------------------')
-    context  = f'> {model_save_path}\n'
-    context += f'> Dice     : {np.mean( dice_list      ):.4f} & {np.std( dice_list      ):.4f}\n'
-    context += f'> Hd       : {np.mean( hd_list        )    :.2f} & {np.std( hd_list        )    :.2f}\n'   
-    context += f'> Slice_acc: {np.mean( sa_list        ):.4f} & {np.std( sa_list        ):.4f}\n'
-    context += f'> Recall   : {np.mean( recall_list    ):.4f} & {np.std( recall_list    ):.4f}\n'
-    context += f'> Precision: {np.mean( precision_list ):.4f} & {np.std( precision_list ):.4f}\n'
-    context += f'> Dice_l   : {np.mean( dice_l_list    ):.4f} & {np.std( dice_l_list    ):.4f}\n'
-    context += f'> NSD      : {np.mean( NSD_list    ):.4f} & {np.std( NSD_list    ):.4f}\n'
-
-
-
+    print( f'> Dice     : {np.mean( dice_list      ):.4f} & {np.std( dice_list      ):.4f}\n' )
 
 
